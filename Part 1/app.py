@@ -1,6 +1,7 @@
 """
-Deploy with Azure:
-https://learn.microsoft.com/en-us/azure/app-service/quickstart-python
+short example of how to share an animation via web app
+if possible create video in advance and upload it
+rendering during runtime leads to poor performance
 """
 
 from flask import Flask, render_template_string, request, render_template
@@ -45,7 +46,7 @@ def index():
     
     dynsys = AutoSys2D.FitzHugh_Nagumo(x0=-1.5, y0=-1., parameters=FHN_std_parameters, run_time=500, front_end=False)  
     dynsys.solve()
-    animation = dynsys.webapp_animation()
+    animation = dynsys.webapp_animation().to_html5_video()
     return render_template_string('''
     <!DOCTYPE html>
     <html lang="en">

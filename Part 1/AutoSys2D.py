@@ -199,7 +199,7 @@ class AutonomousSystem2D():
 
         ani = FuncAnimation(self.fig, animate, frames=100, interval=100)
         # interval is delay between frames in ms
-        return ani.to_html5_video()
+        return ani
     
     def notebook_animation(self,):
         #%matplotlib notebook
