@@ -8,7 +8,7 @@ import time
 
 class AutonomousSystem2D():
     """
-    solver for 2d autonomous systems 
+    solver class for 2d autonomous systems 
     with x,y dependent and t independent variables
     
     Linear system
@@ -155,7 +155,6 @@ class AutonomousSystem2D():
         """
         ax1 = self.ax1
         ax2 = self.ax2
-        
         if ax1.lines:     
             x_line = ax1.lines[0]
             x_line.set_xdata(self.t[:n])
@@ -190,13 +189,12 @@ class AutonomousSystem2D():
         nullcline_dy_vals = self.nullcline_dy(x_grid)
         
         # Your animation generation code here
-        self.fig = plt.figure(figsize=(5,2.5), dpi=150)
+        self.fig = plt.figure(figsize=(7,3.5), dpi=150)
         self.ax1 = self.fig.add_subplot(121)    
         self.ax2 = self.fig.add_subplot(122)
         # Create your animation using FuncAnimation
         # Example:
-        def animate(frame, step=50):
-            print("frame", frame, " of ",100)
+        def animate(frame):
             # Update the plot for each frame
             #fig.clear()  # Clear the current figure
             self.ax1.clear()
@@ -212,16 +210,16 @@ class AutonomousSystem2D():
             self.ax2.set_ylim(y_min, y_max)
             self.ax2.set_xlim(x_min, x_max)
 
-            self.ax1.plot(self.t[:frame*step],self.x[:frame*step], c='navy', label='v')
-            self.ax1.plot(self.t[:frame*step],self.y[:frame*step], c='firebrick', label='w')
-            self.ax2.plot(self.x[:frame*step], self.y[:frame*step], 'k-')
-            n = max(frame*step,2)
+            self.ax1.plot(self.t[:frame*10],self.x[:frame*10], c='navy', label='v')
+            self.ax1.plot(self.t[:frame*10],self.y[:frame*10], c='firebrick', label='w')
+            self.ax2.plot(self.x[:frame*10], self.y[:frame*10], 'k-')
+            n = max(frame*10,2)
             self.ax2.plot(self.x[n-2:n], self.y[n-2:n], 'r-', lw=4)
             
             self.ax1.legend(fontsize=6)
             plt.tight_layout()
 
-        ani = FuncAnimation(self.fig, animate, frames=100, interval=250)
+        ani = FuncAnimation(self.fig, animate, frames=1000, interval=100)
         # interval is delay between frames in ms
         return ani
     
@@ -271,8 +269,6 @@ class AutonomousSystem2D():
         for i in range(20,len(self.t),20):
             self.update(i)
 
-LinearSystem = AutonomousSystem2D         
-   
 class StationaryDiffusion1D(AutonomousSystem2D):
     
     xvar_name = 'x'#'c' # concentration
@@ -370,21 +366,21 @@ class Lotka_volterra(AutonomousSystem2D):
     def nullcline_dy(self, x):
         return np.nan * x
     
-class DampedHarmonicOscillator(AutonomousSystem2D):
+class MatheVL1(AutonomousSystem2D):
     
     y_min, y_max = -2,2
     x_min, x_max = -2,2
     
     @staticmethod
     def dxdt(x, y, self):
-        return y
+        return x - self.parameters['k'] * y
     
     @staticmethod
     def dydt(x, y, self):
-        return -2 *  self.parameters['gamma'] * y - self.parameters['omega']**2* x
+        return x**3 - y
     
     def nullcline_dx(self, x):
-        return x
+        return x / self.parameters['k']
     
     def nullcline_dy(self, x):
-        return - self.parameters['omega']**2 * x / (2 *  self.parameters['gamma'])
+        return x**3
