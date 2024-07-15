@@ -66,6 +66,7 @@ class AutonomousSystem2D():
         |  :return: calculate membrane potential & activation variables
         """
         x, y = X
+
         
         dxdt = self.dxdt(x, y, self)
         dydt = self.dydt(x, y, self)
@@ -173,7 +174,7 @@ class AutonomousSystem2D():
         #self.canvas = FigureCanvasAgg(self.fig)
         time.sleep(0.03)
         
-    def webapp_animation(self,equal_range=False ):
+    def webapp_animation(self,equal_range=False, n_frames=100 ):
         x_min, x_max, y_min, y_max = self.get_plot_lims()
         if equal_range:
             x_min = min(x_min, y_min)
@@ -186,6 +187,7 @@ class AutonomousSystem2D():
                   )
         dx, dy = self.dxdt(xx,yy,self), self.dydt(xx,yy,self)
         x_grid = np.linspace(x_min, x_max, 1000)
+        
         nullcline_dx_vals = self.nullcline_dx(x_grid)
         nullcline_dy_vals = self.nullcline_dy(x_grid)
         
@@ -196,21 +198,25 @@ class AutonomousSystem2D():
         # Create your animation using FuncAnimation
         # Example:
         def animate(frame, step=50):
-            print("frame", frame, " of ",100)
+            print("frame", frame, " of ",n_frames)
             # Update the plot for each frame
             #fig.clear()  # Clear the current figure
             self.ax1.clear()
             self.ax2.clear()
+       
             # Plot the updated data
             self.ax1.set_ylim(y_min, y_max)
             self.ax1.set_xlim(0,self.run_time)
             self.ax1.set_xlabel(self.tvar_name)
+            self.ax1.set_ylabel('{x}({t}), {y}({t})'.format(x=self.xvar_name, y=self.yvar_name, t=self.tvar_name))    
             
             self.ax2.quiver(xx,yy,dx,dy)
             self.ax2.plot(x_grid, nullcline_dx_vals, c='c')
             self.ax2.plot(x_grid, nullcline_dy_vals, c='y')
             self.ax2.set_ylim(y_min, y_max)
             self.ax2.set_xlim(x_min, x_max)
+            self.ax2.set_xlabel(self.xvar_name)
+            self.ax2.set_ylabel(self.yvar_name)
 
             self.ax1.plot(self.t[:frame*step],self.x[:frame*step], c='navy', label='v')
             self.ax1.plot(self.t[:frame*step],self.y[:frame*step], c='firebrick', label='w')
@@ -218,10 +224,10 @@ class AutonomousSystem2D():
             n = max(frame*step,2)
             self.ax2.plot(self.x[n-2:n], self.y[n-2:n], 'r-', lw=4)
             
-            self.ax1.legend(fontsize=6)
+            self.ax1.legend(fontsize=6, loc='upper right')
             plt.tight_layout()
 
-        ani = FuncAnimation(self.fig, animate, frames=100, interval=250)
+        ani = FuncAnimation(self.fig, animate, frames=n_frames, interval=250)
         # interval is delay between frames in ms
         return ani
     
